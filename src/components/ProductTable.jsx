@@ -1,6 +1,25 @@
 import Link from "next/link";
 import { formatCategory, formatPrice, formatStock } from "@/lib/format";
 
+function Thumbnail({ src, alt }) {
+  // A locally-added product (step 8) can have an empty thumbnail, since the
+  // field is optional. An <img src=""> re-requests the current page, so we
+  // render a plain placeholder box instead when there's no URL.
+  if (!src) {
+    return <div className="h-12 w-12 rounded-md bg-slate-100" aria-hidden="true" />;
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      width={48}
+      height={48}
+      loading="lazy"
+      className="h-12 w-12 rounded-md bg-slate-100 object-cover"
+    />
+  );
+}
+
 // Desktop view (hidden below the md breakpoint)
 export default function ProductTable({ products }) {
   return (
@@ -22,7 +41,7 @@ export default function ProductTable({ products }) {
               <td className="px-4 py-2">
                 <Link href={`/products/${p.id}`}>
                   {/* Plain <img>: keeps setup simple (next/image needs extra config for external hosts) */}
-                  <img src={p.thumbnail} alt={p.title} width={48} height={48} loading="lazy" className="h-12 w-12 rounded-md bg-slate-100 object-cover" />
+                  <Thumbnail src={p.thumbnail} alt={p.title} />
                 </Link>
               </td>
               <td className="px-4 py-2 font-medium text-slate-900">

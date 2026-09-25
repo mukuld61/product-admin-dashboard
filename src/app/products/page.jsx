@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import useProducts from "@/hooks/useProducts";
 import useDebouncedValue from "@/hooks/useDebouncedValue";
 import useCategories from "@/hooks/useCategories";
@@ -26,7 +27,6 @@ export default function ProductsPage() {
   const category = searchParams.get("category") ?? "";
   const pageSize = parsePageSize(searchParams.get("pageSize"));
 
-  // Bad/unknown sort values are dropped rather than sent to the API as-is.
   const rawSortBy = searchParams.get("sortBy");
   const rawOrder = searchParams.get("order");
   const sortBy = SORT_FIELDS.includes(rawSortBy) ? rawSortBy : "";
@@ -55,9 +55,6 @@ export default function ProductsPage() {
     router.push(`/products?${params.toString()}`);
   }
 
-  // Push debounced search into the URL (must run in an effect, not during render).
-  // Search and category are mutually exclusive (the API can't combine them), so
-  // typing a search term always clears any active category filter too.
   useEffect(() => {
     if (debouncedQuery !== urlQuery) {
       updateUrl({ q: debouncedQuery, category: "", page: 1 });
@@ -69,8 +66,6 @@ export default function ProductsPage() {
     setInputValue(next);
   }
 
-  // DummyJSON can't search and filter by category in the same request, so the
-  // UI keeps them mutually exclusive: picking a category clears the search box.
   function handleCategoryChange(nextCategory) {
     setInputValue("");
     updateUrl({ category: nextCategory, q: "", page: 1 });
@@ -90,7 +85,15 @@ export default function ProductsPage() {
 
   return (
     <>
-      <h1 className="text-xl font-semibold text-slate-900">Products</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-slate-900">Products</h1>
+        <Link
+          href="/products/new"
+          className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800"
+        >
+          Add product
+        </Link>
+      </div>
 
       <div className="mt-4 mb-4 flex flex-wrap items-center gap-3">
         <SearchBox value={inputValue} onChange={handleSearchInput} />
