@@ -6,17 +6,17 @@ import { isCancel } from "@/lib/axios";
 
 // Fetches one page of products for the given query/category/sort/pagination.
 // Handles loading, error, retry, and cancelling stale requests.
-export default function useProducts({ q, category, limit, skip }) {
+export default function useProducts({ q, category, sortBy, order, limit, skip }) {
   const [attempt, setAttempt] = useState(0); // bumped by retry() to refetch
   const [result, setResult] = useState({ key: null, data: null, error: "" });
 
   // Identifies "which request is the current one". Any param change makes a new key.
-  const key = `${q}:${category}:${limit}:${skip}:${attempt}`;
+  const key = `${q}:${category}:${sortBy}:${order}:${limit}:${skip}:${attempt}`;
 
   useEffect(() => {
     const controller = new AbortController();
 
-    getProducts({ q, category, limit, skip, signal: controller.signal })
+    getProducts({ q, category, sortBy, order, limit, skip, signal: controller.signal })
       .then((data) => setResult({ key, data, error: "" }))
       .catch((err) => {
         if (isCancel(err)) return; // we cancelled it ourselves: not an error
@@ -24,11 +24,9 @@ export default function useProducts({ q, category, limit, skip }) {
       });
 
     // Runs when inputs change or the page unmounts: cancel the previous request.
-    // This is what guarantees a fast typist never sees an old result land after a new one.
     return () => controller.abort();
-  }, [key, q, category, limit, skip]);
+  }, [key, q, category, sortBy, order, limit, skip]);
 
-  // A stored result only counts if it belongs to the current request.
   const isCurrent = result.key === key;
 
   return {
