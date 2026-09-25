@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatCategory, formatPrice, formatStock } from "@/lib/format";
 
 // Desktop view (hidden below the md breakpoint)
@@ -17,12 +18,18 @@ export default function ProductTable({ products }) {
         </thead>
         <tbody className="divide-y divide-slate-100">
           {products.map((p) => (
-            <tr key={p.id}>
+            <tr key={p.id} className="hover:bg-slate-50">
               <td className="px-4 py-2">
-                {/* Plain <img>: keeps setup simple (next/image needs extra config for external hosts) */}
-                <img src={p.thumbnail} alt={p.title} width={48} height={48} loading="lazy" className="h-12 w-12 rounded-md bg-slate-100 object-cover" />
+                <Link href={`/products/${p.id}`}>
+                  {/* Plain <img>: keeps setup simple (next/image needs extra config for external hosts) */}
+                  <img src={p.thumbnail} alt={p.title} width={48} height={48} loading="lazy" className="h-12 w-12 rounded-md bg-slate-100 object-cover" />
+                </Link>
               </td>
-              <td className="px-4 py-2 font-medium text-slate-900">{p.title}</td>
+              <td className="px-4 py-2 font-medium text-slate-900">
+                <Link href={`/products/${p.id}`} className="hover:text-teal-700 hover:underline">
+                  {p.title}
+                </Link>
+              </td>
               <td className="px-4 py-2 capitalize text-slate-700">{formatCategory(p.category)}</td>
               <td className="px-4 py-2 text-right text-slate-900">{formatPrice(p.price)}</td>
               <td className="px-4 py-2 text-right text-slate-700">{p.rating.toFixed(1)}</td>

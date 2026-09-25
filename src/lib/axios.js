@@ -26,8 +26,12 @@ api.interceptors.response.use(
 
     const status = error.response?.status ?? null;
 
-    // Expired/invalid token while logged in: clear it and send the user to login
-    if (status === 401 && getToken()) {
+    // Expired/invalid token while logged in: clear it and send the user to login.
+    // skipAuthRedirect (opt-in per request) is for calls where a 401 doesn't mean
+    // "your session expired" -- e.g. DummyJSON returns 401 for a malformed product
+    // id, which should show a not-found state, not log the whole app out.
+    const shouldRedirectOn401 = status === 401 && getToken() && !error.config?.skipAuthRedirect;
+    if (shouldRedirectOn401) {
       clearToken();
       window.location.href = "/login";
     }

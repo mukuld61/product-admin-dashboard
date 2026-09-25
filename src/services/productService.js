@@ -43,3 +43,14 @@ export async function getCategories() {
   const { data } = await api.get("/products/categories");
   return data.map((c) => (typeof c === "string" ? c : c.slug));
 }
+
+// GET /products/{id} -> full product, including images/description/reviews.
+// skipAuthRedirect: true because DummyJSON can return a 401 for a malformed
+// id (e.g. "abc"), and that must show our not-found state, not log the user out.
+export async function getProduct(id, { signal } = {}) {
+  const { data } = await api.get(`/products/${encodeURIComponent(id)}`, {
+    signal,
+    skipAuthRedirect: true,
+  });
+  return data;
+}
